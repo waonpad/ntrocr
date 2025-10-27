@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    volumes:
+      - .:/workspace
+    ports:
+      # ポートはFastAPIのデフォルトポート
+      - "${APP_PORT_HOST}:8000"
+    tty: true
+    stdin_open: true

@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+# https://docs.astral.sh/uv/guides/integration/github/#setting-up-python
+
+jobs:
+  uv-example:
+    name: python
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run Type Check
+        # https://github.com/jordemort/action-pyright
+        # リポジトリのGitHub Actionsのワークフロー権限の設定でGITHUB_TOKENに書き込み権限を与える必要がある
+        uses: jordemort/action-pyright@v1
+        id: type-check
+        continue-on-error: true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          lib: true
+          level: info
+          filter_mode: nofilter
+          fail_on_error: true
+
+      - name: Run Lint
+        id: lint
+        continue-on-error: true
+        run: uv run ruff check --output-format=github
+
+      - name: Run Format
+        id: format
+        continue-on-error: true
+        run: uv run ruff format
+
+      - name: Suggest Fixes
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: ruff
+
+      - name: Error Handling
+        if: steps.type-check.outcome == 'failure' || steps.format.outcome == 'failure' || steps.lint.outcome == 'failure'
+        run: exit 1
