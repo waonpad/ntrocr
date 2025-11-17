@@ -124,6 +124,15 @@ def validate_arrival_date(*, arrival_date: str) -> Literal["最初の日", "次�
     raise ValueError(msg)
 
 
+def validate_player_name(*, name: str) -> str:
+    # 空文字ではないかどうか
+    if len(name) >= 1:
+        return name
+
+    msg = f"不正なプレイヤー名: {name}"
+    raise ValueError(msg)
+
+
 def validate_player_level(*, level: str) -> int:
     # 1~2桁の数値かどうか
     if level.isdigit() and 1 <= len(level) <= 2:  # noqa: PLR2004

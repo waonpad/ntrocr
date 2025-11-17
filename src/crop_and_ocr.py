@@ -10,6 +10,7 @@ from src.validators import (
     validate_player_defeated_enemies,
     validate_player_frasco,
     validate_player_level,
+    validate_player_name,
     validate_player_runes,
     validate_rescues,
     validate_session_id,
@@ -42,8 +43,7 @@ def crop_and_ocr(*, image_path: str) -> None:
             break
 
         player = {
-            # バリデーション不要
-            "name": texts[f"player_{i}_name"],
+            "name": validate_player_name(name=texts[f"player_{i}_name"]),
             "level": validate_player_level(level=texts[f"player_{i}_level"]),
             "defeated_enemies": validate_player_defeated_enemies(
                 defeated_enemies=texts[f"player_{i}_defeated_enemies"]
