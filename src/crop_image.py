@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 import cv2
 
 # TODO: weapon_typeのOCR結果が杖か聖印だったらspell_y_bufferを60にする
@@ -20,7 +23,7 @@ paths = {
     "weapon_spell_2": {"x1": 680, "y1": 430, "x2": 1200, "y2": 460},
     # 付帯効果1つ目の名前
     "weapon_accessory_1_name": {"x1": 680, "y1": 430 + spell_y_buffer, "x2": 1070, "y2": 460 + spell_y_buffer},
-    # 付帯効果1つ目の符号(+, _, 空文字)
+    # 付帯効果1つ目の符号(+, -, 空文字)
     "weapon_accessory_1_value_sign": {"x1": 1070, "y1": 430 + spell_y_buffer, "x2": 1090, "y2": 460 + spell_y_buffer},
     # 付帯効果1つ目の数値(1~3桁の数値 + %があるかもしれない, 空文字の可能性もあり)
     "weapon_accessory_1_value": {"x1": 1100, "y1": 430 + spell_y_buffer, "x2": 1180, "y2": 460 + spell_y_buffer},
@@ -31,16 +34,16 @@ paths = {
     "weapon_accessory_3_name": {"x1": 680, "y1": 510 + spell_y_buffer, "x2": 1070, "y2": 530 + spell_y_buffer},
     "weapon_accessory_3_value_sign": {"x1": 1070, "y1": 510 + spell_y_buffer, "x2": 1090, "y2": 530 + spell_y_buffer},
     "weapon_accessory_3_value": {"x1": 1100, "y1": 510 + spell_y_buffer, "x2": 1180, "y2": 530 + spell_y_buffer},
-    # タリスマン
+    # TODO: タリスマン
     #
-    # 夜の王アイコン(画像認識?)
+    # TODO: 夜の王アイコン(画像認識?)
     #
     # 到達日(最初の日, 次の日, 最期の日)
     "arrival_date": {"x1": 1430, "y1": 180, "x2": 1530, "y2": 210},
-    # 勝ち負け(光があるか無いか, 画像認識?)
+    # TODO: 勝ち負け(光があるか無いか, 画像認識?)
     "game_result": {"x1": 1670, "y1": 180, "x2": 1690, "y2": 210},
     "player": {
-        # キャラアイコン(画像認識?)
+        # TODO: キャラアイコン(画像認識?)
         #
         # 文字列
         "name": {"x1": 1410, "y1": 290, "x2": 1700, "y2": 320},
@@ -65,26 +68,50 @@ paths = {
     "session_id": {"x1": 1570, "y1": 920, "x2": 1860, "y2": 950},
 }
 
-# 画像パスと切り取り範囲を指定
-img_path = "/workspace/images/20251028014715_1.jpg"
 
-img = cv2.imread(img_path)
+def crop_image(*, image_path: str) -> list[Path]:
+    # /workspace/cropped を空にする
+    Path("/workspace/cropped").mkdir(parents=True, exist_ok=True)
+    for file in Path("/workspace/cropped").glob("*"):
+        file.unlink()
+
+    img = cv2.imread(image_path)
+
+    results: list[Path] = []
+
+    # 全部切り取り
+    for key, path in paths.items():
+        # playerだけは、player_y_bufferをyに加算して3回切り取り
+        if key == "player":
+            for i in range(3):
+                for pkey, ppath in path.items():
+                    crop = img[
+                        ppath["y1"] + i * player_y_buffer : ppath["y2"] + i * player_y_buffer,  # type: ignore
+                        ppath["x1"] : ppath["x2"],  # type: ignore
+                    ]
+
+                    cropped_image_path = Path(f"/workspace/cropped/player_{i + 1}_{pkey}.jpg")
+
+                    cv2.imwrite(str(cropped_image_path), crop)
+
+                    results.append(cropped_image_path)
+
+                    print(f"切り取った画像を {cropped_image_path} に保存しました")
+            continue
+
+        crop = img[path["y1"] : path["y2"], path["x1"] : path["x2"]]
+
+        cropped_image_path = Path(f"/workspace/cropped/{key}.jpg")
+
+        cv2.imwrite(str(cropped_image_path), crop)
+
+        results.append(cropped_image_path)
+
+        print(f"切り取った画像を {cropped_image_path} に保存しました")
+
+    return results
 
 
-# 全部切り取り
-for key, path in paths.items():
-    # playerだけは、player_y_bufferをyに加算して3回切り取り
-    if key == "player":
-        for i in range(3):
-            for pkey, ppath in path.items():
-                crop = img[
-                    ppath["y1"] + i * player_y_buffer : ppath["y2"] + i * player_y_buffer,  # type: ignore
-                    ppath["x1"] : ppath["x2"],  # type: ignore
-                ]
-                cv2.imwrite(f"/workspace/crop_{key}_{i + 1}_{pkey}.jpg", crop)
-                print(f"切り取った画像を /workspace/crop_{key}_{i + 1}_{pkey}.jpg に保存しました")
-        continue
-
-    crop = img[path["y1"] : path["y2"], path["x1"] : path["x2"]]
-    cv2.imwrite(f"/workspace/crop_{key}.jpg", crop)
-    print(f"切り取った画像を /workspace/crop_{key}.jpg に保存しました")
+if __name__ == "__main__":
+    image_path = sys.argv[1]
+    crop_image(image_path=image_path)
