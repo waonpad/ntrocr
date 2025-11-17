@@ -5,8 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastapi[standard]>=0.118.0",
-    "pydantic>=2.9.2",
+    "onnxocr>=2025.5",
 ]
 
 [tool.uv]
@@ -35,6 +34,10 @@ ignore = [
     "ANN201", # 毎回関数の返り値の型を書くのは面倒なので無視する
     # "PD011", # pandasを使う場合
     # "B008", # FastAPIでDependsを使う場合
+    "T201", # printを許可する
+    "PGH003", # 型チェック無視のためのコメントが無くてもOKにする
+    "FIX002", # todoコメントを許可する
+    "ERA001", # コードのコメントアウトを許可する
 ]
 extend-select = ["I"]
 # https://docs.astral.sh/ruff/settings/#lint_logger-objects

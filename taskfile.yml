@@ -4,15 +4,9 @@ dotenv:
   - ".env"
 
 tasks:
-  copy-env:
-    desc: 環境変数ファイルのコピーを行う
-    cmds:
-      - cp -n .env.example .env
-
   setup:
     desc: プロジェクトのセットアップを行う
     cmds:
-      - task: copy-env
       - lefthook install
 
   lint:
