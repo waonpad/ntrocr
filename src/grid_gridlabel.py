@@ -33,8 +33,8 @@ def draw_grid_with_labels(*, image_path: str) -> None:
             cv2.putText(img, label, (x + 1, y + 8), font, font_scale, font_color, font_thickness, cv2.LINE_AA)
 
     # 保存
-    cv2.imwrite(f"/workspace/grid_output_{img_path.split('/')[-1].split('.')[0]}.jpg", img)
-    print(f"グリッド画像を /workspace/grid_output_{img_path.split('/')[-1].split('.')[0]}.jpg に保存しました")
+    cv2.imwrite(f"grid_output_{img_path.split('/')[-1].split('.')[0]}.jpg", img)
+    print(f"グリッド画像を grid_output_{img_path.split('/')[-1].split('.')[0]}.jpg に保存しました")
 
 
 if __name__ == "__main__":

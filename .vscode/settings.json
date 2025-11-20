@@ -15,7 +15,7 @@
     ".mypy_cache": true,
     ".pytest_cache": true,
     ".ruff_cache": true,
-    ".venv": true
+    ".venv": false
   },
   "python.analysis.autoImportCompletions": true,
   "python.analysis.fixAll": [

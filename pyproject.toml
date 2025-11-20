@@ -8,40 +8,67 @@ dependencies = [
     "onnxocr>=2025.5",
 ]
 
-[tool.uv]
-dev-dependencies = [
-    "lefthook>=1.13.5",
+[dependency-groups]
+dev = [
+    "lefthook>=2.0.4",
     "pyright>=1.1.405",
     "ruff>=0.13.2",
 ]
 
 [tool.ruff]
+# https://docs.astral.sh/ruff/
 src = ["src"]
-line-length = 120
-# extend-exclude = [
-#     "migrations"
-# ]
+line-length = 120 # デフォルトの88では短いので緩くする
 
 [tool.ruff.lint]
-select = ["ALL"]
+# https://docs.astral.sh/ruff/linter/
+select = ["ALL"] # 無効にしない限り全てのルールを適用する
 ignore = [
-    "ANN1", "E999", "UP027", "PT004", "PT005", # 非推奨ルール
+    "FIX", # TODOコメント等を使用可能にする
     "COM812", "ISC001", # Ruffの警告が出るので無視
-    "D", # docstring関連は緩くやりたいので全部無視する
-    "TD001", # FIXMEをコメントのタグに使用可能にする
+    "TD001", # FIXME等をコメントのタグに使用可能にする
     "TD002", # TODOのauthorを不要にする
     "TD003", # TODOのチケットへのリンクを不要にする
-    "ANN201", # 毎回関数の返り値の型を書くのは面倒なので無視する
-    # "PD011", # pandasを使う場合
-    # "B008", # FastAPIでDependsを使う場合
-    "T201", # printを許可する
-    "PGH003", # 型チェック無視のためのコメントが無くてもOKにする
-    "FIX002", # todoコメントを許可する
-    "ERA001", # コードのコメントアウトを許可する
+    "ANN201", "ANN202", "ANN204", "ANN205", "ANN206", # 関数やメソッドの返り値の型を推論に任せた方が楽な場合が多いので無視する
+    "D400", "D415", # 日本語に合わないdocstring末尾のルールを無視
 ]
-extend-select = ["I"]
-# https://docs.astral.sh/ruff/settings/#lint_logger-objects
-logger-objects = []
+extend-select = [
+    "I", # isort
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S101", # assertを使用可能にする
+    "PLR2004", # マジックナンバーの使用を可能にする
+    "D", # ドキュメントを不要にする
+    "N802", # 日本語を使用するため、lowercaseでなくても良いようにする
+    "PLC2401", # 日本語を使用するため、ASCII文字列以外を使用可能にする
+]
+"**/__init__.py" = [
+    "D104", # ファイルの説明を不要にする
+]
+"src/usecases/**/*.py" = [
+    "D100", # ユースケースには1関数しか配置しないため、モジュールのドキュメントが不要
+]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPIプロジェクトにおけるB008ルールの代替
+# https://github.com/fastapi/fastapi/issues/1522#issuecomment-1435803420
+extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.Query", "fastapi.params.Query"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+# https://docs.astral.sh/ruff/formatter/
+docstring-code-format = true
+indent-style = "space"
+line-ending = "auto"
+
 
 [tool.pyright]
 typeCheckingMode = "strict"

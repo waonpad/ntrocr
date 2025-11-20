@@ -1,5 +1,5 @@
-import sys
 from pathlib import Path
+import sys
 
 import cv2
 
@@ -70,9 +70,8 @@ paths = {
 
 
 def crop_image(*, image_path: str) -> list[Path]:
-    # /workspace/cropped を空にする
-    Path("/workspace/cropped").mkdir(parents=True, exist_ok=True)
-    for file in Path("/workspace/cropped").glob("*"):
+    # cropped を空にする
+    for file in Path("cropped").glob("*"):
         file.unlink()
 
     img = cv2.imread(image_path)
@@ -90,7 +89,7 @@ def crop_image(*, image_path: str) -> list[Path]:
                         ppath["x1"] : ppath["x2"],  # type: ignore
                     ]
 
-                    cropped_image_path = Path(f"/workspace/cropped/player_{i + 1}_{pkey}.jpg")
+                    cropped_image_path = Path(f"cropped/player_{i + 1}_{pkey}.jpg")
 
                     cv2.imwrite(str(cropped_image_path), crop)
 
@@ -101,7 +100,7 @@ def crop_image(*, image_path: str) -> list[Path]:
 
         crop = img[path["y1"] : path["y2"], path["x1"] : path["x2"]]
 
-        cropped_image_path = Path(f"/workspace/cropped/{key}.jpg")
+        cropped_image_path = Path(f"cropped/{key}.jpg")
 
         cv2.imwrite(str(cropped_image_path), crop)
 

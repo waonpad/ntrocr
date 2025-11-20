@@ -7,7 +7,6 @@ tasks:
   setup:
     desc: プロジェクトのセットアップを行う
     cmds:
-      - export PYTHONPATH=/workspace:$PYTHONPATH
       - lefthook install
 
   lint:

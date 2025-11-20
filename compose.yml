@@ -1,9 +1,0 @@
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - .:/workspace
-    tty: true
-    stdin_open: true
